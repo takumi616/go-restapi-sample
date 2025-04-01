@@ -1,0 +1,33 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  run-api-server:
+    desc: Run API server
+    cmds:
+      - task: up-postgres
+      - task: migration
+      - task: build-app
+      - task: up-app
+
+  up-postgres:
+    desc: Start the Postgres service
+    cmds:
+      - docker compose up -d postgres
+
+  migration:
+    desc: Run database migrations inside the Postgres container
+    deps: [up-postgres]
+    cmds:
+      - docker compose exec postgres sh -c "until pg_isready; do sleep 1; done"
+      - migrate -path ./infrastructure/migrations -database "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable" up
+
+  build-app:
+    cmds:
+      - docker compose build app
+
+  up-app:
+    desc: Run the golang app
+    cmds: 
+      - docker compose up app
