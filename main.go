@@ -2,98 +2,66 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
-	"log"
+	"log/slog"
+	"os"
 
-	"github.com/caarlos0/env"
 	_ "github.com/lib/pq"
+	"github.com/takumi616/go-restapi-sample/adapter/handler"
+	"github.com/takumi616/go-restapi-sample/adapter/repository"
+	"github.com/takumi616/go-restapi-sample/infrastructure/config"
+	"github.com/takumi616/go-restapi-sample/infrastructure/database"
+	"github.com/takumi616/go-restapi-sample/infrastructure/database/crud"
+	"github.com/takumi616/go-restapi-sample/infrastructure/web"
+	"github.com/takumi616/go-restapi-sample/usecase"
 )
 
-type config struct {
-	Port       string `env:"APP_CONTAINER_PORT"`
-	DBHost     string `env:"POSTGRES_HOST"`
-	DBPort     string `env:"POSTGRES_PORT"`
-	DBUser     string `env:"POSTGRES_USER"`
-	DBPassword string `env:"POSTGRES_PASSWORD"`
-	DBName     string `env:"POSTGRES_DB"`
-	DBSslmode  string `env:"POSTGRES_SSLMODE"`
-}
+func run(ctx context.Context) error {
+	// Initialize logger
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
 
-type vocabulary struct {
-	vocabularyNo int
-	title        string
-	meaning      string
-	sentence     string
-}
-
-func getConfig() (*config, error) {
-	config := &config{}
-	if err := env.Parse(config); err != nil {
-		return nil, err
+	// Get port number from config
+	appInfo, err := config.GetAppInfo()
+	if err != nil {
+		return err
 	}
-	return config, nil
+
+	// Get DB connection information from config
+	pgConnectionInfo, err := config.GetPgConnectionInfo()
+	if err != nil {
+		return err
+	}
+
+	// Open DB
+	db, err := database.Open(ctx, pgConnectionInfo)
+	if err != nil {
+		return err
+	}
+
+	// Set up dependencies between layers
+	vocabPersistence := &crud.VocabPersistence{DB: db}
+	vocabRepository := &repository.VocabRepository{Persistence: vocabPersistence}
+	vocabUsecase := &usecase.VocabUsecase{Repository: vocabRepository}
+	vocabHandler := &handler.VocabHandler{Usecase: vocabUsecase}
+
+	// Register handlers
+	serveMux := &web.ServeMux{Handler: vocabHandler}
+	mux := serveMux.RegisterHandler()
+
+	// Run server
+	server := &web.Server{Port: appInfo.Port, Handler: mux}
+	if err = server.Run(ctx); err != nil {
+		return err
+	}
+
+	slog.InfoContext(ctx, "http server was shut down successfully")
+
+	return nil
 }
 
 func main() {
-	config, err := getConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dataSourceName := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		config.DBHost, config.DBPort, config.DBUser,
-		config.DBPassword, config.DBName, config.DBSslmode,
-	)
-	dbHandle, err := sql.Open("postgres", dataSourceName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	ctx := context.Background()
-	conn, err := dbHandle.Conn(ctx)
-	if err != nil {
-		log.Fatal(err)
+	if err := run(ctx); err != nil {
+		slog.ErrorContext(ctx, err.Error())
 	}
-
-	r, err := conn.ExecContext(
-		ctx,
-		"INSERT INTO vocabularies(title, meaning, sentence) VALUES($1, $2, $3)",
-		"test",
-		"test meaning",
-		"test sentence",
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = r.RowsAffected()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	rows, err := conn.QueryContext(ctx, "SELECT * FROM vocabularies")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	vocabularies := make([]vocabulary, 0)
-	for rows.Next() {
-		var vocabulary vocabulary
-		if err := rows.Scan(
-			&vocabulary.vocabularyNo, &vocabulary.title,
-			&vocabulary.meaning, &vocabulary.sentence,
-		); err != nil {
-			log.Fatal(err)
-		}
-		vocabularies = append(vocabularies, vocabulary)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("Result: %v", vocabularies)
 }
