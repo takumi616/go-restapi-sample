@@ -25,6 +25,7 @@ func (vp *VocabPersistence) Create(ctx context.Context, vocabulary *entity.Vocab
 		slog.ErrorContext(ctx, err.Error())
 		return 0, errors.New("failed to establish database connection")
 	}
+	defer conn.Close()
 
 	// Begin transaction
 	tx, err := conn.BeginTx(ctx, nil)
