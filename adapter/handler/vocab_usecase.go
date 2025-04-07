@@ -8,4 +8,6 @@ import (
 
 type VocabUsecase interface {
 	AddVocabulary(ctx context.Context, vocabulary *entity.Vocabulary) (int64, error)
+
+	GetVocabularyList(ctx context.Context) ([]*entity.Vocabulary, error)
 }

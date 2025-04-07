@@ -20,3 +20,12 @@ func (vu *VocabUsecase) AddVocabulary(ctx context.Context, vocabulary *entity.Vo
 
 	return rowsAffected, err
 }
+
+func (vu *VocabUsecase) GetVocabularyList(ctx context.Context) ([]*entity.Vocabulary, error) {
+	vocabularyList, err := vu.Repository.FindAll(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "found an error returned from adapter layer")
+	}
+
+	return vocabularyList, err
+}

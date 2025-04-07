@@ -14,6 +14,7 @@ func (s *ServeMux) RegisterHandler() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /api/vocabularies", s.Handler.AddVocabulary)
+	mux.HandleFunc("GET /api/vocabularies", s.Handler.GetVocabularyList)
 
 	return mux
 }
