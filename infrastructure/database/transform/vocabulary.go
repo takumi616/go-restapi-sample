@@ -12,3 +12,12 @@ func ToModel(entity *entity.Vocabulary) *model.CreateVocabularyInput {
 		Sentence: entity.Sentence,
 	}
 }
+
+func ToEntity(output *model.FindVocabularyOutput) *entity.Vocabulary {
+	return &entity.Vocabulary{
+		VocabularyNo: output.VocabularyNo,
+		Title:        output.Title,
+		Meaning:      output.Meaning,
+		Sentence:     output.Sentence,
+	}
+}
