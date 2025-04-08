@@ -6,6 +6,7 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+
 	"github.com/takumi616/go-restapi-sample/adapter/handler"
 	"github.com/takumi616/go-restapi-sample/adapter/repository"
 	"github.com/takumi616/go-restapi-sample/infrastructure/config"
