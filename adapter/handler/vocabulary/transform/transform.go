@@ -1,8 +1,8 @@
 package transform
 
 import (
-	"github.com/takumi616/go-restapi-sample/adapter/handler/request"
-	"github.com/takumi616/go-restapi-sample/adapter/handler/response"
+	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/request"
+	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/response"
 	"github.com/takumi616/go-restapi-sample/entity"
 )
 

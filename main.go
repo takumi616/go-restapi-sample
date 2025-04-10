@@ -7,13 +7,13 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/takumi616/go-restapi-sample/adapter/handler"
-	"github.com/takumi616/go-restapi-sample/adapter/repository"
+	vocabHandler "github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary"
+	vocabRepository "github.com/takumi616/go-restapi-sample/adapter/repository/vocabulary"
 	"github.com/takumi616/go-restapi-sample/infrastructure/config"
 	"github.com/takumi616/go-restapi-sample/infrastructure/database"
-	"github.com/takumi616/go-restapi-sample/infrastructure/database/crud"
+	vocabPersistence "github.com/takumi616/go-restapi-sample/infrastructure/database/vocabulary/persistence"
 	"github.com/takumi616/go-restapi-sample/infrastructure/web"
-	"github.com/takumi616/go-restapi-sample/usecase"
+	vocabUsecase "github.com/takumi616/go-restapi-sample/usecase/vocabulary"
 )
 
 func run(ctx context.Context) error {
@@ -39,14 +39,14 @@ func run(ctx context.Context) error {
 		return err
 	}
 
-	// Set up dependencies between layers
-	vocabPersistence := &crud.VocabPersistence{DB: db}
-	vocabRepository := &repository.VocabRepository{Persistence: vocabPersistence}
-	vocabUsecase := &usecase.VocabUsecase{Repository: vocabRepository}
-	vocabHandler := &handler.VocabHandler{Usecase: vocabUsecase}
+	//Set up dependencies between layers
+	vocabPersistence := vocabPersistence.New(db)
+	vocabRepository := vocabRepository.New(vocabPersistence)
+	vocabUsecase := vocabUsecase.New(vocabRepository)
+	vocabHandler := vocabHandler.New(vocabUsecase)
 
 	// Register handlers
-	serveMux := &web.ServeMux{Handler: vocabHandler}
+	serveMux := &web.ServeMux{VocabHandler: vocabHandler}
 	mux := serveMux.RegisterHandler()
 
 	// Run server

@@ -1,4 +1,4 @@
-package handler
+package vocabulary
 
 import (
 	"context"

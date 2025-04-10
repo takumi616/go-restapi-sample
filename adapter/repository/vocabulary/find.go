@@ -1,4 +1,4 @@
-package repository
+package vocabulary
 
 import (
 	"context"

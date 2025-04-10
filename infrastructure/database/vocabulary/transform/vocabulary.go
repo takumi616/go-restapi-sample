@@ -2,7 +2,7 @@ package transform
 
 import (
 	"github.com/takumi616/go-restapi-sample/entity"
-	"github.com/takumi616/go-restapi-sample/infrastructure/database/model"
+	"github.com/takumi616/go-restapi-sample/infrastructure/database/vocabulary/model"
 )
 
 func ToModel(entity *entity.Vocabulary) *model.CreateVocabularyInput {
