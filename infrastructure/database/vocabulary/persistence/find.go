@@ -1,4 +1,4 @@
-package crud
+package persistence
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"log/slog"
 
 	"github.com/takumi616/go-restapi-sample/entity"
-	"github.com/takumi616/go-restapi-sample/infrastructure/database/model"
-	"github.com/takumi616/go-restapi-sample/infrastructure/database/transform"
+	"github.com/takumi616/go-restapi-sample/infrastructure/database/vocabulary/model"
+	"github.com/takumi616/go-restapi-sample/infrastructure/database/vocabulary/transform"
 )
 
 func (vp *VocabPersistence) FindAll(ctx context.Context) ([]*entity.Vocabulary, error) {

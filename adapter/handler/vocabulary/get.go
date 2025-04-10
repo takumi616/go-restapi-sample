@@ -1,12 +1,12 @@
-package handler
+package vocabulary
 
 import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
 
-	"github.com/takumi616/go-restapi-sample/adapter/handler/response"
-	"github.com/takumi616/go-restapi-sample/adapter/handler/transform"
+	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/response"
+	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/transform"
 )
 
 func (vh *VocabHandler) GetVocabularyList(w http.ResponseWriter, r *http.Request) {

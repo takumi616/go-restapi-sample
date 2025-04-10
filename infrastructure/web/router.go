@@ -3,18 +3,18 @@ package web
 import (
 	"net/http"
 
-	"github.com/takumi616/go-restapi-sample/adapter/handler"
+	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary"
 )
 
 type ServeMux struct {
-	Handler *handler.VocabHandler
+	VocabHandler *vocabulary.VocabHandler
 }
 
 func (s *ServeMux) RegisterHandler() http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /api/vocabularies", s.Handler.AddVocabulary)
-	mux.HandleFunc("GET /api/vocabularies", s.Handler.GetVocabularyList)
+	mux.HandleFunc("POST /api/vocabularies", s.VocabHandler.AddVocabulary)
+	mux.HandleFunc("GET /api/vocabularies", s.VocabHandler.GetVocabularyList)
 
 	return mux
 }

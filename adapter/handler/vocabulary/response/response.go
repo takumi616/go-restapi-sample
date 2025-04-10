@@ -1,5 +1,9 @@
 package response
 
+type ErrorRes struct {
+	Message string `json:"message"`
+}
+
 type AddVocabularyRes struct {
 	RowsAffected int64 `json:"rows_affected"`
 }
