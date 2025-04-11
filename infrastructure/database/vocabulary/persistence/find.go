@@ -43,3 +43,21 @@ func (vp *VocabPersistence) FindAll(ctx context.Context) ([]*entity.Vocabulary, 
 
 	return vocabularyList, nil
 }
+
+func (vp *VocabPersistence) FindByVocabNo(ctx context.Context, vocabularyNo int) (*entity.Vocabulary, error) {
+	var row model.FindVocabularyOutput
+	if err := vp.DB.QueryRowContext(
+		ctx,
+		"SELECT vocabulary_no, title, meaning, sentence FROM vocabularies WHERE vocabulary_no = $1",
+		vocabularyNo,
+	).Scan(&row.VocabularyNo, &row.Title, &row.Meaning, &row.Sentence); err != nil {
+		slog.ErrorContext(ctx, err.Error())
+		return nil, errors.New("failed to select the expected row")
+	}
+
+	vocabulary := transform.ToEntity(&row)
+
+	slog.InfoContext(ctx, "the vocabulary specified by vocabularyNo was fetched successfully")
+
+	return vocabulary, nil
+}
