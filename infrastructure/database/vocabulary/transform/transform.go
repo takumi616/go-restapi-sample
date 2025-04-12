@@ -5,8 +5,8 @@ import (
 	"github.com/takumi616/go-restapi-sample/infrastructure/database/vocabulary/model"
 )
 
-func ToModel(entity *entity.Vocabulary) *model.CreateVocabularyInput {
-	return &model.CreateVocabularyInput{
+func ToModel(entity *entity.Vocabulary) *model.VocabularyInput {
+	return &model.VocabularyInput{
 		Title:    entity.Title,
 		Meaning:  entity.Meaning,
 		Sentence: entity.Sentence,

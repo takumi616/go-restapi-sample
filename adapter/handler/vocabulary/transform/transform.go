@@ -6,7 +6,7 @@ import (
 	"github.com/takumi616/go-restapi-sample/entity"
 )
 
-func ToEntity(req *request.AddVocabularyReq) *entity.Vocabulary {
+func ToEntity(req *request.VocabularyReq) *entity.Vocabulary {
 	return &entity.Vocabulary{
 		Title:    req.Title,
 		Meaning:  req.Meaning,

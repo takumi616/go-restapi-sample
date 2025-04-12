@@ -12,4 +12,6 @@ type VocabUsecase interface {
 	GetVocabularyList(ctx context.Context) ([]*entity.Vocabulary, error)
 
 	GetVocabularyByNo(ctx context.Context, vocabularyNo int) (*entity.Vocabulary, error)
+
+	UpdateVocabulary(ctx context.Context, vocabularyNo int, vocabulary *entity.Vocabulary) (int64, error)
 }
