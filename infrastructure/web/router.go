@@ -17,6 +17,7 @@ func (s *ServeMux) RegisterHandler() http.Handler {
 	mux.HandleFunc("GET /api/vocabularies", s.VocabHandler.GetVocabularyList)
 	mux.HandleFunc("GET /api/vocabularies/{id}", s.VocabHandler.GetVocabularyByNo)
 	mux.HandleFunc("PUT /api/vocabularies/{id}", s.VocabHandler.UpdateVocabulary)
+	mux.HandleFunc("DELETE /api/vocabularies/{id}", s.VocabHandler.DeleteVocabulary)
 
 	return mux
 }
