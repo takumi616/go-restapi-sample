@@ -1,6 +1,6 @@
 package request
 
-type AddVocabularyReq struct {
+type VocabularyReq struct {
 	Title    string `json:"title"`
 	Meaning  string `json:"meaning"`
 	Sentence string `json:"sentence"`

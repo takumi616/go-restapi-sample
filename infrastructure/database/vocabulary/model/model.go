@@ -1,6 +1,6 @@
 package model
 
-type CreateVocabularyInput struct {
+type VocabularyInput struct {
 	Title    string
 	Meaning  string
 	Sentence string

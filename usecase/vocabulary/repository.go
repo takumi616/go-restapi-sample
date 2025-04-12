@@ -12,4 +12,6 @@ type VocabRepository interface {
 	FindAll(ctx context.Context) ([]*entity.Vocabulary, error)
 
 	FindByVocabNo(ctx context.Context, vocabularyNo int) (*entity.Vocabulary, error)
+
+	Update(ctx context.Context, vocabularyNo int, vocabulary *entity.Vocabulary) (int64, error)
 }

@@ -4,7 +4,7 @@ type ErrorRes struct {
 	Message string `json:"message"`
 }
 
-type AddVocabularyRes struct {
+type RowsAffectedRes struct {
 	RowsAffected int64 `json:"rows_affected"`
 }
 
