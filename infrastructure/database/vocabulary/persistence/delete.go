@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 )
 
@@ -10,16 +9,22 @@ func (vp *VocabPersistence) Delete(ctx context.Context, vocabularyNo int) (int64
 	// Get a DB connection from connection pool
 	conn, err := vp.DB.Conn(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to establish the database connection")
+		slog.ErrorContext(
+			ctx, "failed to get a database connection from the connection pool",
+			"err", err,
+		)
+		return 0, err
 	}
 	defer conn.Close()
 
 	// Begin a transaction
 	tx, err := conn.BeginTx(ctx, nil)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to begin transaction")
+		slog.ErrorContext(
+			ctx, "failed to begin a transaction",
+			"err", err,
+		)
+		return 0, err
 	}
 	defer tx.Rollback()
 
@@ -31,21 +36,30 @@ func (vp *VocabPersistence) Delete(ctx context.Context, vocabularyNo int) (int64
 	)
 
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to delete the vocabulary record")
+		slog.ErrorContext(
+			ctx, "failed to delete the vocabulary record",
+			"err", err,
+		)
+		return 0, err
 	}
 
 	// Check rows affected number
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to get a rows affected")
+		slog.ErrorContext(
+			ctx, "failed to get a rows affected",
+			"err", err,
+		)
+		return 0, err
 	}
 
-	// Commit transaction
+	// Commit the transaction
 	if err := tx.Commit(); err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to commit transaction")
+		slog.ErrorContext(
+			ctx, "failed to commit the transaction",
+			"err", err,
+		)
+		return 0, err
 	}
 
 	slog.InfoContext(ctx, "the vocabulary specified by vocabularyNo was deleted successfully")

@@ -8,7 +8,10 @@ import (
 	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/request"
 	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/response"
 	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/transform"
+	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/util"
 )
+
+const CREATE_VOCABULARY_ERROR = "Could not register a new vocabulary"
 
 func (vh *VocabHandler) AddVocabulary(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -16,11 +19,11 @@ func (vh *VocabHandler) AddVocabulary(w http.ResponseWriter, r *http.Request) {
 	// Read http request body
 	var req request.VocabularyReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		if err = json.NewEncoder(w).Encode(&response.ErrorRes{Message: "failed to read a request body"}); err != nil {
-			slog.ErrorContext(ctx, "failed to write an error message to response body")
-		}
+		slog.ErrorContext(
+			ctx, "failed to read a request body",
+			"err", err,
+		)
+		util.WriteResponse(ctx, w, http.StatusBadRequest, response.ErrorRes{Message: CREATE_VOCABULARY_ERROR})
 		return
 	}
 
@@ -30,18 +33,10 @@ func (vh *VocabHandler) AddVocabulary(w http.ResponseWriter, r *http.Request) {
 	// Execute usecase layer logic
 	rowsAffected, err := vh.Usecase.AddVocabulary(ctx, vocabulary)
 	if err != nil {
-		slog.ErrorContext(ctx, "found an error returned from usecase layer")
-		w.WriteHeader(http.StatusInternalServerError)
-		if err = json.NewEncoder(w).Encode(&response.ErrorRes{Message: err.Error()}); err != nil {
-			slog.ErrorContext(ctx, "failed to write an error message to response body")
-		}
+		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: CREATE_VOCABULARY_ERROR})
 		return
 	}
 
-	// Write a returned result to response body
-	w.WriteHeader(http.StatusOK)
-	if err = json.NewEncoder(w).Encode(response.RowsAffectedRes{RowsAffected: rowsAffected}); err != nil {
-		slog.ErrorContext(ctx, "failed to write a rows affected to response body")
-		return
-	}
+	// Write a returned result to the response body
+	util.WriteResponse(ctx, w, http.StatusOK, response.RowsAffectedRes{RowsAffected: rowsAffected})
 }
