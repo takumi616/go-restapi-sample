@@ -13,19 +13,25 @@ func (vp *VocabPersistence) Create(ctx context.Context, vocabulary *entity.Vocab
 	// Transform received entity into DB model
 	vocabModel := transform.ToModel(vocabulary)
 
-	// Get a DB connection from connection pool
+	// Get a DB connection from the connection pool
 	conn, err := vp.DB.Conn(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to establish database connection")
+		slog.ErrorContext(
+			ctx, "failed to get a database connection from the connection pool",
+			"err", err,
+		)
+		return 0, err
 	}
 	defer conn.Close()
 
-	// Begin transaction
+	// Begin a transaction
 	tx, err := conn.BeginTx(ctx, nil)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to begin transaction")
+		slog.ErrorContext(
+			ctx, "failed to begin a transaction",
+			"err", err,
+		)
+		return 0, err
 	}
 	defer tx.Rollback()
 
@@ -38,12 +44,17 @@ func (vp *VocabPersistence) Create(ctx context.Context, vocabulary *entity.Vocab
 	).Scan(&exists)
 
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to check existing vocabulary")
+		slog.ErrorContext(
+			ctx, "failed to check if the same vocabulary already exists",
+			"err", err,
+		)
+		return 0, err
 	}
 
 	if exists {
-		return 0, errors.New("vocabulary with the same title already exists")
+		errmsg := errors.New("failed to insert the vocabulary because the same one already exists")
+		slog.ErrorContext(ctx, errmsg.Error())
+		return 0, errmsg
 	}
 
 	// Execute an insert process
@@ -56,21 +67,30 @@ func (vp *VocabPersistence) Create(ctx context.Context, vocabulary *entity.Vocab
 	)
 
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to insert a new vocabulary record")
+		slog.ErrorContext(
+			ctx, "failed to insert a new vocabulary record",
+			"err", err,
+		)
+		return 0, err
 	}
 
 	// Check rows affected number
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to get a rows affected")
+		slog.ErrorContext(
+			ctx, "failed to get a rows affected",
+			"err", err,
+		)
+		return 0, err
 	}
 
-	// Commit transaction
+	// Commit the transaction
 	if err := tx.Commit(); err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return 0, errors.New("failed to commit transaction")
+		slog.ErrorContext(
+			ctx, "failed to commit the transaction",
+			"err", err,
+		)
+		return 0, err
 	}
 
 	slog.InfoContext(ctx, "new vocabulary record was inserted successfully")

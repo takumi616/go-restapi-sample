@@ -1,14 +1,17 @@
 package vocabulary
 
 import (
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/response"
 	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/transform"
+	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary/util"
 )
+
+const FETCH_ALL_VOCABULARIES_ERROR = "Could not fetch the all vocabularies"
+const FETCH_VOCABULARY_ERROR = "Could not fetch the vocabulary"
 
 func (vh *VocabHandler) GetVocabularyList(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -16,11 +19,7 @@ func (vh *VocabHandler) GetVocabularyList(w http.ResponseWriter, r *http.Request
 	// Execute the usecase layer logic
 	vocabularyList, err := vh.Usecase.GetVocabularyList(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, "found an error returned from the usecase layer")
-		w.WriteHeader(http.StatusInternalServerError)
-		if err = json.NewEncoder(w).Encode(&response.ErrorRes{Message: err.Error()}); err != nil {
-			slog.ErrorContext(ctx, "failed to write an error message to response body")
-		}
+		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: FETCH_ALL_VOCABULARIES_ERROR})
 		return
 	}
 
@@ -30,12 +29,8 @@ func (vh *VocabHandler) GetVocabularyList(w http.ResponseWriter, r *http.Request
 		res = append(res, transform.ToResponse(vocabulary))
 	}
 
-	// Write the selected vocabularies to the response body
-	w.WriteHeader(http.StatusOK)
-	if err = json.NewEncoder(w).Encode(res); err != nil {
-		slog.ErrorContext(ctx, "failed to write the selected vocabularies to the response body")
-		return
-	}
+	// Write a returned result to the response body
+	util.WriteResponse(ctx, w, http.StatusOK, res)
 }
 
 func (vh *VocabHandler) GetVocabularyByNo(w http.ResponseWriter, r *http.Request) {
@@ -44,29 +39,21 @@ func (vh *VocabHandler) GetVocabularyByNo(w http.ResponseWriter, r *http.Request
 	// Get the vocabularyNo from the request path
 	vocabularyNo, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		if err = json.NewEncoder(w).Encode(&response.ErrorRes{Message: "failed to convert received ID into int type"}); err != nil {
-			slog.ErrorContext(ctx, "failed to write an error message to the response body")
-		}
+		slog.ErrorContext(
+			ctx, "failed to convert received ID into int type",
+			"err", err,
+		)
+		util.WriteResponse(ctx, w, http.StatusBadRequest, response.ErrorRes{Message: FETCH_VOCABULARY_ERROR})
 		return
 	}
 
 	// Execute the usecase layer logic
 	vocabulary, err := vh.Usecase.GetVocabularyByNo(ctx, vocabularyNo)
 	if err != nil {
-		slog.ErrorContext(ctx, "found an error returned from the usecase layer")
-		w.WriteHeader(http.StatusInternalServerError)
-		if err = json.NewEncoder(w).Encode(&response.ErrorRes{Message: err.Error()}); err != nil {
-			slog.ErrorContext(ctx, "failed to write an error message to the response body")
-		}
+		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: FETCH_VOCABULARY_ERROR})
 		return
 	}
 
-	// Write the selected vocabulary to the response body
-	w.WriteHeader(http.StatusOK)
-	if err = json.NewEncoder(w).Encode(transform.ToResponse(vocabulary)); err != nil {
-		slog.ErrorContext(ctx, "failed to write the selected vocabulary to the response body")
-		return
-	}
+	// Write a returned result to the response body
+	util.WriteResponse(ctx, w, http.StatusOK, transform.ToResponse(vocabulary))
 }

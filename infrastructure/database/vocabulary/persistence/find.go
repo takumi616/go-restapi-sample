@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
 	"github.com/takumi616/go-restapi-sample/entity"
@@ -17,8 +16,11 @@ func (vp *VocabPersistence) FindAll(ctx context.Context) ([]*entity.Vocabulary, 
 		"SELECT vocabulary_no, title, meaning, sentence FROM vocabularies ORDER BY vocabulary_no ASC",
 	)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return nil, errors.New("failed to select the expected rows")
+		slog.ErrorContext(
+			ctx, "failed to select the expected rows",
+			"err", err,
+		)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -27,19 +29,25 @@ func (vp *VocabPersistence) FindAll(ctx context.Context) ([]*entity.Vocabulary, 
 	for rows.Next() {
 		var vocabulary model.FindVocabularyOutput
 		if err := rows.Scan(&vocabulary.VocabularyNo, &vocabulary.Title, &vocabulary.Meaning, &vocabulary.Sentence); err != nil {
-			slog.ErrorContext(ctx, err.Error())
-			return nil, errors.New("failed to copy the columns")
+			slog.ErrorContext(
+				ctx, "failed to copy the columns",
+				"err", err,
+			)
+			return nil, err
 		}
 		vocabularyList = append(vocabularyList, transform.ToEntity(&vocabulary))
 	}
 
 	// Check for errors from iterating over rows
 	if err := rows.Err(); err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return nil, errors.New("found an error during iteration")
+		slog.ErrorContext(
+			ctx, "found an error during iteration",
+			"err", err,
+		)
+		return nil, err
 	}
 
-	slog.InfoContext(ctx, "all vocabularies in database were fetched successfully")
+	slog.InfoContext(ctx, "all vocabularies were fetched successfully")
 
 	return vocabularyList, nil
 }
@@ -51,8 +59,11 @@ func (vp *VocabPersistence) FindByVocabNo(ctx context.Context, vocabularyNo int)
 		"SELECT vocabulary_no, title, meaning, sentence FROM vocabularies WHERE vocabulary_no = $1",
 		vocabularyNo,
 	).Scan(&row.VocabularyNo, &row.Title, &row.Meaning, &row.Sentence); err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return nil, errors.New("failed to select the expected row")
+		slog.ErrorContext(
+			ctx, "failed to select the expected row",
+			"err", err,
+		)
+		return nil, err
 	}
 
 	vocabulary := transform.ToEntity(&row)
