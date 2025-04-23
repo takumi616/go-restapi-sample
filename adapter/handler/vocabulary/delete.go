@@ -28,6 +28,10 @@ func (vh *VocabHandler) DeleteVocabulary(w http.ResponseWriter, r *http.Request)
 	// Execute the usecase layer logic
 	rowsAffected, err := vh.Usecase.DeleteVocabulary(ctx, vocabularyNo)
 	if err != nil {
+		slog.ErrorContext(
+			ctx, "an error occurred while deleting the vocabulary",
+			"err", err,
+		)
 		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: DELETE_VOCABULARY_ERROR})
 		return
 	}

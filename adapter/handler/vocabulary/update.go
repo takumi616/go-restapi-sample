@@ -45,6 +45,10 @@ func (vh *VocabHandler) UpdateVocabulary(w http.ResponseWriter, r *http.Request)
 	// Execute the usecase layer logic
 	rowsAffected, err := vh.Usecase.UpdateVocabulary(ctx, vocabularyNo, vocabulary)
 	if err != nil {
+		slog.ErrorContext(
+			ctx, "an error occurred while updating the vocabulary",
+			"err", err,
+		)
 		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: UPDATE_VOCABULARY_ERROR})
 		return
 	}

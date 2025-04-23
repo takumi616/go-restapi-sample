@@ -2,7 +2,6 @@ package web
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"net"
 	"net/http"
@@ -30,8 +29,8 @@ func (s *Server) Run(ctx context.Context) error {
 	// Create http listener
 	listener, err := net.Listen("tcp", ":"+s.Port)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return errors.New("failed to create http listener")
+		slog.ErrorContext(ctx, "failed to create http listener")
+		return err
 	}
 
 	// Start server
@@ -41,8 +40,8 @@ func (s *Server) Run(ctx context.Context) error {
 		if err == http.ErrServerClosed {
 			return nil
 		} else {
-			slog.ErrorContext(ctx, err.Error())
-			return errors.New("failed to serve http")
+			slog.ErrorContext(ctx, "failed to serve http")
+			return err
 		}
 	})
 

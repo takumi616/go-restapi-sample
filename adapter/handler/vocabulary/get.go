@@ -19,6 +19,10 @@ func (vh *VocabHandler) GetVocabularyList(w http.ResponseWriter, r *http.Request
 	// Execute the usecase layer logic
 	vocabularyList, err := vh.Usecase.GetVocabularyList(ctx)
 	if err != nil {
+		slog.ErrorContext(
+			ctx, "an error occurred while getting the vocabulary list",
+			"err", err,
+		)
 		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: FETCH_ALL_VOCABULARIES_ERROR})
 		return
 	}
@@ -50,6 +54,10 @@ func (vh *VocabHandler) GetVocabularyByNo(w http.ResponseWriter, r *http.Request
 	// Execute the usecase layer logic
 	vocabulary, err := vh.Usecase.GetVocabularyByNo(ctx, vocabularyNo)
 	if err != nil {
+		slog.ErrorContext(
+			ctx, "an error occurred while getting the vocabulary",
+			"err", err,
+		)
 		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: FETCH_VOCABULARY_ERROR})
 		return
 	}
