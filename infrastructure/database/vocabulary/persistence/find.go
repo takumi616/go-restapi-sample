@@ -16,10 +16,7 @@ func (vp *VocabPersistence) FindAll(ctx context.Context) ([]*entity.Vocabulary, 
 		"SELECT vocabulary_no, title, meaning, sentence FROM vocabularies ORDER BY vocabulary_no ASC",
 	)
 	if err != nil {
-		slog.ErrorContext(
-			ctx, "failed to select the expected rows",
-			"err", err,
-		)
+		slog.ErrorContext(ctx, "failed to select the expected rows")
 		return nil, err
 	}
 	defer rows.Close()
@@ -29,10 +26,7 @@ func (vp *VocabPersistence) FindAll(ctx context.Context) ([]*entity.Vocabulary, 
 	for rows.Next() {
 		var vocabulary model.FindVocabularyOutput
 		if err := rows.Scan(&vocabulary.VocabularyNo, &vocabulary.Title, &vocabulary.Meaning, &vocabulary.Sentence); err != nil {
-			slog.ErrorContext(
-				ctx, "failed to copy the columns",
-				"err", err,
-			)
+			slog.ErrorContext(ctx, "failed to copy the columns")
 			return nil, err
 		}
 		vocabularyList = append(vocabularyList, transform.ToEntity(&vocabulary))
@@ -40,10 +34,7 @@ func (vp *VocabPersistence) FindAll(ctx context.Context) ([]*entity.Vocabulary, 
 
 	// Check for errors from iterating over rows
 	if err := rows.Err(); err != nil {
-		slog.ErrorContext(
-			ctx, "found an error during iteration",
-			"err", err,
-		)
+		slog.ErrorContext(ctx, "found an error during iteration")
 		return nil, err
 	}
 
@@ -59,10 +50,7 @@ func (vp *VocabPersistence) FindByVocabNo(ctx context.Context, vocabularyNo int)
 		"SELECT vocabulary_no, title, meaning, sentence FROM vocabularies WHERE vocabulary_no = $1",
 		vocabularyNo,
 	).Scan(&row.VocabularyNo, &row.Title, &row.Meaning, &row.Sentence); err != nil {
-		slog.ErrorContext(
-			ctx, "failed to select the expected row",
-			"err", err,
-		)
+		slog.ErrorContext(ctx, "failed to select the expected row")
 		return nil, err
 	}
 

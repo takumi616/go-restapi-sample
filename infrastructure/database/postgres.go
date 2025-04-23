@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log/slog"
 
@@ -19,13 +18,13 @@ func Open(ctx context.Context, pgConnectionInfo *config.PgConnectionInfo) (*sql.
 
 	db, err := sql.Open("postgres", dataSourceName)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return nil, errors.New("failed to open the database")
+		slog.ErrorContext(ctx, "failed to open the database")
+		return nil, err
 	}
 
 	if err := db.PingContext(ctx); err != nil {
-		slog.ErrorContext(ctx, err.Error())
-		return nil, errors.New("connection to the database is not alive")
+		slog.ErrorContext(ctx, "connection to the database is not alive")
+		return nil, err
 	}
 
 	slog.InfoContext(ctx, "database was opened successfully")

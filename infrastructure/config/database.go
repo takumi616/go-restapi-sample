@@ -1,7 +1,7 @@
 package config
 
 import (
-	"errors"
+	"context"
 	"log/slog"
 
 	"github.com/caarlos0/env"
@@ -16,11 +16,11 @@ type PgConnectionInfo struct {
 	DBSslmode  string `env:"POSTGRES_SSLMODE"`
 }
 
-func GetPgConnectionInfo() (*PgConnectionInfo, error) {
+func GetPgConnectionInfo(ctx context.Context) (*PgConnectionInfo, error) {
 	pgConnectionInfo := &PgConnectionInfo{}
 	if err := env.Parse(pgConnectionInfo); err != nil {
-		slog.Error(err.Error())
-		return nil, errors.New("failed to load postgres connection info from environment variables")
+		slog.ErrorContext(ctx, "failed to load the postgres connection info from the environment variables")
+		return pgConnectionInfo, err
 	}
 	return pgConnectionInfo, nil
 }

@@ -33,6 +33,10 @@ func (vh *VocabHandler) AddVocabulary(w http.ResponseWriter, r *http.Request) {
 	// Execute usecase layer logic
 	rowsAffected, err := vh.Usecase.AddVocabulary(ctx, vocabulary)
 	if err != nil {
+		slog.ErrorContext(
+			ctx, "an error occurred while adding the vocabulary",
+			"err", err,
+		)
 		util.WriteResponse(ctx, w, http.StatusInternalServerError, response.ErrorRes{Message: CREATE_VOCABULARY_ERROR})
 		return
 	}

@@ -22,13 +22,13 @@ func run(ctx context.Context) error {
 	slog.SetDefault(logger)
 
 	// Get port number from config
-	appInfo, err := config.GetAppInfo()
+	appInfo, err := config.GetAppInfo(ctx)
 	if err != nil {
 		return err
 	}
 
 	// Get DB connection information from config
-	pgConnectionInfo, err := config.GetPgConnectionInfo()
+	pgConnectionInfo, err := config.GetPgConnectionInfo(ctx)
 	if err != nil {
 		return err
 	}
@@ -63,6 +63,9 @@ func run(ctx context.Context) error {
 func main() {
 	ctx := context.Background()
 	if err := run(ctx); err != nil {
-		slog.ErrorContext(ctx, err.Error())
+		slog.ErrorContext(
+			ctx, "API server could not start",
+			"err", err,
+		)
 	}
 }
