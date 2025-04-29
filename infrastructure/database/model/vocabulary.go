@@ -6,7 +6,7 @@ type VocabularyInput struct {
 	Sentence string
 }
 
-type FindVocabularyOutput struct {
+type VocabularyOutput struct {
 	VocabularyNo int
 	Title        string
 	Meaning      string

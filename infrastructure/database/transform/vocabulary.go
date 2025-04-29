@@ -2,7 +2,7 @@ package transform
 
 import (
 	"github.com/takumi616/go-restapi-sample/entity"
-	"github.com/takumi616/go-restapi-sample/infrastructure/database/vocabulary/model"
+	"github.com/takumi616/go-restapi-sample/infrastructure/database/model"
 )
 
 func ToModel(entity *entity.Vocabulary) *model.VocabularyInput {
@@ -13,7 +13,7 @@ func ToModel(entity *entity.Vocabulary) *model.VocabularyInput {
 	}
 }
 
-func ToEntity(output *model.FindVocabularyOutput) *entity.Vocabulary {
+func ToEntity(output *model.VocabularyOutput) *entity.Vocabulary {
 	return &entity.Vocabulary{
 		VocabularyNo: output.VocabularyNo,
 		Title:        output.Title,
