@@ -8,7 +8,7 @@ type RowsAffectedRes struct {
 	RowsAffected int64 `json:"rows_affected"`
 }
 
-type GetVocabularyRes struct {
+type VocabularyRes struct {
 	VocabularyNo int    `json:"vocabulary_no"`
 	Title        string `json:"title"`
 	Meaning      string `json:"meaning"`

@@ -3,11 +3,11 @@ package web
 import (
 	"net/http"
 
-	"github.com/takumi616/go-restapi-sample/adapter/handler/vocabulary"
+	"github.com/takumi616/go-restapi-sample/adapter/handler"
 )
 
 type ServeMux struct {
-	VocabHandler *vocabulary.VocabHandler
+	VocabHandler *handler.VocabHandler
 }
 
 func (s *ServeMux) RegisterHandler() http.Handler {
